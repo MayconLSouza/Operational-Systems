@@ -70,6 +70,7 @@ public class RedesController {
 	
 	// IP Linux
 	public void ipLinux(String processIP) {
+		String[] adaptador = null;
 		try {
 			Process process = Runtime.getRuntime().exec(processIP);
 			InputStream fluxo = process.getInputStream();
@@ -77,12 +78,19 @@ public class RedesController {
 			BufferedReader buffer = new BufferedReader(leitor);
 			String linha = buffer.readLine();
 			while(linha != null) {
-				//if() Adaptador de rede?
-				if(linha.contains("inet")) {
-					String[] inet = linha.split(" ");				// Pega o número IPv4
-					System.out.println("IPv4: " + inet[1]);
+				if(linha.contains("mtu")) {
+					adaptador = linha.split(": ");					// Pega o nome do adaptador
 				}
+				if(linha.contains("inet ")) {
+					String[] inet = linha.split(" ");				// Pega o número IPv4
+					System.out.println("Nome do Adaptador: " + adaptador[1]);
+					System.out.println("IPv4: " + inet[5]);
+				}
+				linha = buffer.readLine(); // Lê a próxima linha
 			}
+			buffer.close();
+			leitor.close();
+			fluxo.close();
 		} catch (Exception e) {
 			String msgError = e.getMessage();
 			System.err.println(msgError);
@@ -145,7 +153,7 @@ public class RedesController {
 				//Média
 				if(linha.contains("avg")) {
 					String[] media = linha.split("/");
-					System.out.println("Media = " + Integer.parseInt(media[4]));
+					System.out.println("Media = " + media[4] +" ms");
 				}
 				linha = buffer.readLine(); // Lê a próxima linha
 			}
